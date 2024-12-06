@@ -28,7 +28,7 @@ module.exports = {
   },
   rules: {
     'prettier/prettier': [
-      'warn',
+      'off',
       {
         singleQuote: true,
         semi: false,
