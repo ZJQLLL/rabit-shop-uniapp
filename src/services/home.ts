@@ -25,7 +25,25 @@ export interface GetHomeBannerResult {
      */
     type: number;
 }
+export interface getCategoryResult {
+    /**
+     * 展示图标
+     */
+    icon: string;
+    /**
+     * id
+     */
+    id: string;
+    /**
+     * 分类名称
+     */
+    name: string;
+}
 
+/**
+ * 
+ * 首页-广告区域（获取轮播图）
+ */
 export const getHomeBannerAPI = (params:GetHomeBannerParams)=>{
     return http<GetHomeBannerResult[]>({
         method:'GET',
@@ -33,5 +51,15 @@ export const getHomeBannerAPI = (params:GetHomeBannerParams)=>{
         data:{
             params
         }
+    })
+}
+
+/**
+ * 获取前台分类
+ */
+export const getCategoryAPI = ()=>{
+    return http<getCategoryResult[]>({
+        method:'GET',
+        url:'/home/category/mutli'
     })
 }
