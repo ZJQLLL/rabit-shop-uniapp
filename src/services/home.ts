@@ -39,6 +39,32 @@ export interface getCategoryResult {
      */
     name: string;
 }
+export interface getHotResult {
+     /**
+     * 推荐说明
+     */
+     alt: string;
+     /**
+      * id
+      */
+     id: string;
+     /**
+      * 图片集合
+      */
+     pictures: string[];
+     /**
+      * 跳转地址
+      */
+     target: string;
+     /**
+      * 推荐标题
+      */
+     title: string;
+     /**
+      * 推荐类型
+      */
+     type: string;
+}
 
 /**
  * 
@@ -61,5 +87,15 @@ export const getCategoryAPI = ()=>{
     return http<getCategoryResult[]>({
         method:'GET',
         url:'/home/category/mutli'
+    })
+}
+
+/**
+ * 获取热门推荐
+ */
+export const getHotAPI=()=>{
+    return http<getHotResult[]>({
+        method:'GET',
+        url:'/home/hot/mutli'
     })
 }

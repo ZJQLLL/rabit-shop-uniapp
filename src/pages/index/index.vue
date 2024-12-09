@@ -2,10 +2,10 @@
 import CustomNavbar  from './components/CustomNavbar.vue'
 import XtxSwiper from '@/components/XtxSwiper.vue'
 import {onMounted,ref} from 'vue'
-import type {GetHomeBannerResult,getCategoryResult} from '@/services/home'
-import {getHomeBannerAPI,getCategoryAPI} from '@/services/home'
+import type {GetHomeBannerResult,getCategoryResult,getHotResult} from '@/services/home'
+import {getHomeBannerAPI,getCategoryAPI,getHotAPI} from '@/services/home'
 import CategoryPanel  from './components/CategoryPanel.vue'
-
+import HotPanel from './components/HotPanel.vue'
 //轮播图数据
 const bannerList = ref<GetHomeBannerResult[]>([])
 const getHomeBannerData =async ()=>{
@@ -18,9 +18,16 @@ const getHomeCategoryData =async ()=>{
  const res = await getCategoryAPI()
  categoryList.value = res.result??[]
 }
+//热门数据
+const hotList = ref<getHotResult[]>([])
+const getHomeHotData = async()=>{
+ const res = await getHotAPI()
+  hotList.value = res.result??[]
+}
 onMounted(()=>{
   getHomeBannerData()
   getHomeCategoryData()
+  getHomeHotData()
 })
 </script>
 
@@ -31,6 +38,8 @@ onMounted(()=>{
   <XtxSwiper :list ="bannerList"/>
   <!-- 前台分类模块 -->
   <CategoryPanel :list="categoryList"/>
+  <!-- 热门推荐模块 -->
+   <HotPanel :list="hotList"/>
   
 </template>
 
