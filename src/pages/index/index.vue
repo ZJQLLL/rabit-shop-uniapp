@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import CustomNavbar  from './components/CustomNavbar.vue'
 import XtxSwiper from '@/components/XtxSwiper.vue'
+import XtxGuessLike from '@/components/XtxGuessLike.vue'
 import {onMounted,ref} from 'vue'
 import type {GetHomeBannerResult,getCategoryResult,getHotResult} from '@/services/home'
 import {getHomeBannerAPI,getCategoryAPI,getHotAPI} from '@/services/home'
@@ -34,17 +35,28 @@ onMounted(()=>{
 <template>
   <!-- 自定义导航区 -->
   <CustomNavbar/>
-  <!-- 轮播图模块 -->
+  <scroll-view scroll-y class="scroll" >
+    <!-- 轮播图模块 -->
   <XtxSwiper :list ="bannerList"/>
   <!-- 前台分类模块 -->
   <CategoryPanel :list="categoryList"/>
   <!-- 热门推荐模块 -->
    <HotPanel :list="hotList"/>
+   <!-- 猜你喜欢模块 -->
+  <XtxGuessLike/>
+  </scroll-view>
+  
   
 </template>
 
 <style lang="scss">
 page {
   background-color: #f7f7f7;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+.scroll {
+  flex: 1;
 }
 </style>
