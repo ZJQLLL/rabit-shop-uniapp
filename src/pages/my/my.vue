@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useMemberStore } from '@/stores'
-import {http} from '@/utils/http'
+
+import {getHomeBannerAPI} from '@/services/home'
 const memberStore = useMemberStore()
 const getData =async () => {
- const res = await http({
-    method:'GET',
-    url:'/home/banner',
-  })
+  
+ const res = await getHomeBannerAPI({distributionSite:1})
+  console.log(24,res);
   
 }
 </script>
