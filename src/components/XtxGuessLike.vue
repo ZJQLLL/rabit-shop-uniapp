@@ -1,5 +1,17 @@
 <script setup lang="ts">
-//
+import {getGuessLikeAPI} from '@/services/home'
+import {onMounted,ref} from 'vue'
+import type {GuessLikeItem} from '@/services/home'
+
+const guessList = ref<GuessLikeItem[]>([])
+const getGuessLikeData = async()=>{
+   const res = await getGuessLikeAPI({})
+   guessList.value = res.result?.items??[]
+}
+
+onMounted(()=>{
+    getGuessLikeData()
+})
 </script>
 
 <template>
@@ -10,19 +22,19 @@
   <view class="guess">
     <navigator
       class="guess-item"
-      v-for="item in 10"
-      :key="item"
-      :url="`/pages/goods/goods?id=4007498`"
+      v-for="item in guessList"
+      :key="item.id"
+      :url="`/pages/goods/goods`"
     >
       <image
         class="image"
         mode="aspectFill"
-        src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_1.jpg"
+        :src="item.picture"
       ></image>
-      <view class="name"> 德国THORE男表 超薄手表男士休闲简约夜光石英防水直径40毫米 </view>
+      <view class="name"> {{ item.name }} </view>
       <view class="price">
         <text class="small">¥</text>
-        <text>899.00</text>
+        <text>{{ item.price }}</text>
       </view>
     </navigator>
   </view>

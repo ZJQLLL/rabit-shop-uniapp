@@ -66,6 +66,70 @@ export interface getHotResult {
      type: string;
 }
 
+export interface getGuessLikeParams {
+    /**
+     * 页码默认值1
+     */
+    page?: number;
+    /**
+     * 页大小默认是10
+     */
+    pageSize?: number;
+}
+//写成泛型方便之后书写
+export interface PageResult<T> {
+     /**
+     * 总条数
+     */
+     counts: number;
+     /**
+      * 当前页数据
+      */
+     items: T[];
+     /**
+      * 当前页数
+      */
+     page: number;
+     /**
+      * 总页数
+      */
+     pages: number;
+     /**
+      * 每页条数
+      */
+     pageSize: number;
+}
+export interface GuessLikeItem {
+    /**
+     * 商品描述
+     */
+    desc: string;
+    /**
+     * 商品折扣
+     */
+    discount: number;
+    /**
+     * id
+     */
+    id: string;
+    /**
+     * 商品名称
+     */
+    name: string;
+    /**
+     * 商品已下单数量
+     */
+    orderNum: number;
+    /**
+     * 商品图片
+     */
+    picture: string;
+    /**
+     * 商品价格
+     */
+    price: number;
+}
+
 /**
  * 
  * 首页-广告区域（获取轮播图）
@@ -97,5 +161,18 @@ export const getHotAPI=()=>{
     return http<getHotResult[]>({
         method:'GET',
         url:'/home/hot/mutli'
+    })
+}
+
+/**
+ * 猜你喜欢
+ */
+export const getGuessLikeAPI = (params:getGuessLikeParams)=>{
+    return http<PageResult<GuessLikeItem>>({
+        method:'GET',
+        url:'/home/goods/guessLike',
+        data:{
+            params
+        }
     })
 }
