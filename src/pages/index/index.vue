@@ -7,6 +7,7 @@ import type {GetHomeBannerResult,getCategoryResult,getHotResult} from '@/service
 import {getHomeBannerAPI,getCategoryAPI,getHotAPI} from '@/services/home'
 import CategoryPanel  from './components/CategoryPanel.vue'
 import HotPanel from './components/HotPanel.vue'
+import Skeleton from './components/Skeleton.vue'
 //轮播图数据
 const bannerList = ref<GetHomeBannerResult[]>([])
 const getHomeBannerData =async ()=>{
@@ -48,11 +49,16 @@ const onRefresherrefresh = async()=>{
   
 }
 
+const isLoading = ref(true)
 
-onMounted(()=>{
-  getHomeBannerData()
-  getHomeCategoryData()
-  getHomeHotData()
+onMounted(async()=>{
+  isLoading.value = true
+  Promise.all([
+  getHomeBannerData(),
+  getHomeCategoryData(),
+  getHomeHotData(),
+  ])
+  isLoading.value = false
 })
 </script>
 
@@ -68,14 +74,19 @@ onMounted(()=>{
   @refresherrefresh="onRefresherrefresh"
   :refresher-triggered="isTriger"
   >
-    <!-- 轮播图模块 -->
-  <XtxSwiper :list ="bannerList"/>
-  <!-- 前台分类模块 -->
-  <CategoryPanel :list="categoryList"/>
-  <!-- 热门推荐模块 -->
-   <HotPanel :list="hotList"/>
-   <!-- 猜你喜欢模块 -->
-  <XtxGuessLike ref="guessRef" />
+    <!-- 骨架屏 -->
+    <Skeleton v-if="isLoading"/>
+    <template v-else>
+      <!-- 轮播图模块 -->
+      <XtxSwiper :list ="bannerList"/>
+      <!-- 前台分类模块 -->
+      <CategoryPanel :list="categoryList"/>
+      <!-- 热门推荐模块 -->
+      <HotPanel :list="hotList"/>
+      <!-- 猜你喜欢模块 -->
+      <XtxGuessLike ref="guessRef" />
+    </template>
+    
   </scroll-view>
   
   
