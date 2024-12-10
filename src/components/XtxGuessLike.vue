@@ -3,14 +3,42 @@ import {getGuessLikeAPI} from '@/services/home'
 import {onMounted,ref} from 'vue'
 import type {GuessLikeItem} from '@/services/home'
 
+const pageParams = {
+  page:31,
+  pageNum:10,
+}
+const finish = ref<boolean>(false)
 const guessList = ref<GuessLikeItem[]>([])
 const getGuessLikeData = async()=>{
-   const res = await getGuessLikeAPI({})
-   guessList.value = res.result?.items??[]
+  if(finish.value) {
+    uni.showToast({
+      icon:'none',
+      title:'没有更多数据啦~~~'
+    })
+    return
+  }
+
+  const res = await getGuessLikeAPI(pageParams)
+  if(res.result?.items){
+    //不断追加每页数据(继续触底)
+   guessList.value.push (...res.result.items)
+   
+   if(pageParams.page<res.result.pages){
+    pageParams.page++
+   }else {
+    finish.value = true
+   }
+  }
+   
 }
 
 onMounted(()=>{
     getGuessLikeData()
+})
+
+//子组件方法暴露出去,以便给父亲使用
+defineExpose({
+  getMore:getGuessLikeData
 })
 </script>
 
@@ -38,7 +66,7 @@ onMounted(()=>{
       </view>
     </navigator>
   </view>
-  <view class="loading-text"> 正在加载... </view>
+  <view class="loading-text"> {{finish?'没有更多数据~':'正在加载...'}} </view>
 </template>
 
 <style lang="scss">

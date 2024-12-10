@@ -134,13 +134,11 @@ export interface GuessLikeItem {
  * 
  * 首页-广告区域（获取轮播图）
  */
-export const getHomeBannerAPI = (params:GetHomeBannerParams)=>{
+export const getHomeBannerAPI = (data:GetHomeBannerParams)=>{
     return http<GetHomeBannerResult[]>({
         method:'GET',
         url:'/home/banner',
-        data:{
-            params
-        }
+        data,
     })
 }
 
@@ -167,12 +165,10 @@ export const getHotAPI=()=>{
 /**
  * 猜你喜欢
  */
-export const getGuessLikeAPI = (params:getGuessLikeParams)=>{
+export const getGuessLikeAPI = (data:getGuessLikeParams)=>{
     return http<PageResult<GuessLikeItem>>({
         method:'GET',
         url:'/home/goods/guessLike',
-        data:{
-            params
-        }
+        data,
     })
 }
