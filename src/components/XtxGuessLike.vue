@@ -4,11 +4,18 @@ import {onMounted,ref} from 'vue'
 import type {GuessLikeItem} from '@/services/home'
 
 const pageParams = {
-  page:31,
+  page:1,
   pageNum:10,
 }
 const finish = ref<boolean>(false)
 const guessList = ref<GuessLikeItem[]>([])
+
+const resetData = ()=>{
+  pageParams.page = 1
+  guessList.value = []
+  finish.value = false
+}
+
 const getGuessLikeData = async()=>{
   if(finish.value) {
     uni.showToast({
@@ -22,7 +29,7 @@ const getGuessLikeData = async()=>{
   if(res.result?.items){
     //不断追加每页数据(继续触底)
    guessList.value.push (...res.result.items)
-   
+
    if(pageParams.page<res.result.pages){
     pageParams.page++
    }else {
@@ -38,7 +45,8 @@ onMounted(()=>{
 
 //子组件方法暴露出去,以便给父亲使用
 defineExpose({
-  getMore:getGuessLikeData
+  getMore:getGuessLikeData,
+  resetData,
 })
 </script>
 

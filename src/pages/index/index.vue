@@ -32,6 +32,23 @@ const guessRef = ref()
 const onScrollToLower = ()=>{
   guessRef.value.getMore()
 }
+
+const isTriger = ref(true)
+//自定义下拉刷回调(重新请求)
+const onRefresherrefresh = async()=>{
+  guessRef.value.resetData() //重置猜你喜欢数据
+  isTriger.value = true
+  await Promise.all([
+    getHomeBannerData(),
+    getHomeCategoryData(),
+    getHomeHotData(),
+    guessRef.value.getMore() //重新获取子组件猜你喜欢数据
+  ])
+  isTriger.value = false
+  
+}
+
+
 onMounted(()=>{
   getHomeBannerData()
   getHomeCategoryData()
@@ -43,7 +60,14 @@ onMounted(()=>{
   <!-- 自定义导航区 -->
   <CustomNavbar/>
   <!-- 滚动区域(标签+指定高度flex) -->
-  <scroll-view scroll-y class="scroll" @scrolltolower="onScrollToLower">
+  <scroll-view 
+  scroll-y 
+  class="scroll" 
+  @scrolltolower="onScrollToLower"
+  refresher-enabled
+  @refresherrefresh="onRefresherrefresh"
+  :refresher-triggered="isTriger"
+  >
     <!-- 轮播图模块 -->
   <XtxSwiper :list ="bannerList"/>
   <!-- 前台分类模块 -->
