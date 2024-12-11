@@ -4,6 +4,7 @@ import {getHomeBannerAPI, type GetHomeBannerResult} from '@/services/home'
 import {getCategoryTopAPI, type GetCategoryTopResult} from '@/services/category'
 import {ref,computed} from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
+import Skeleton from './components/Skeleton.vue';
 
 //轮播图
 const bannerList = ref<GetHomeBannerResult[]>([])
@@ -19,6 +20,8 @@ const getCategoryData = async()=>{
 }
 //高亮下标
 const activeIndex = ref(0)
+//加载完成
+const isFinish = ref(false)
 
 //当前Tab对应的二级分类内容
 const currentSubCategoryList = computed(()=>{
@@ -26,14 +29,18 @@ const currentSubCategoryList = computed(()=>{
 })
 
 //页面加载
-onLoad(()=>{
-  getBannerData()
-  getCategoryData()
+onLoad(async()=>{
+  isFinish.value = false
+  await Promise.all([
+  getBannerData(),
+  getCategoryData(),
+  ])
+  isFinish.value = true
 })
 </script>
 
 <template>
-  <view class="viewport">
+  <view class="viewport" v-if="isFinish">
     <!-- 搜索框 -->
     <view class="search">
       <view class="input">
@@ -85,6 +92,7 @@ onLoad(()=>{
       </scroll-view>
     </view>
   </view>
+  <Skeleton v-else/>
 </template>
 
 <style lang="scss">
