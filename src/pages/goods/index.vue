@@ -11,6 +11,21 @@ const getGoodsDetail = async()=>{
  goodsDetail.value = res.result
 }
 
+//轮播图当前下标
+const currentIndex = ref(0)
+//轮播图改变
+const onChange:UniHelper.SwiperOnChange = (e)=>{
+  currentIndex.value = e.detail.current
+}
+
+//点击图片预览
+const onTap = (url:string)=>{
+  uni.previewImage({
+    current:url,
+    urls:goodsDetail.value!.mainPictures,
+  })
+}
+
 onLoad(()=>{
   getGoodsDetail()
 })
@@ -26,18 +41,19 @@ const query = defineProps<{
     <view class="goods">
       <!-- 商品主图 -->
       <view class="preview">
-        <swiper circular>
+        <swiper circular @change="onChange">
           <swiper-item v-for="item in goodsDetail?.mainPictures" :key="item">
             <image
               mode="aspectFill"
               :src="item"
+              @tap="onTap(item)"
             />
           </swiper-item>
         </swiper>
         <view class="indicator">
-          <text class="current">1</text>
+          <text class="current">{{ currentIndex+1 }}</text>
           <text class="split">/</text>
-          <text class="total">5</text>
+          <text class="total">{{ goodsDetail?.mainPictures.length }}</text>
         </view>
       </view>
 
@@ -135,6 +151,8 @@ const query = defineProps<{
       <view class="buynow"> 立即购买 </view>
     </view>
   </view>
+
+  
 </template>
 
 <style lang="scss">
