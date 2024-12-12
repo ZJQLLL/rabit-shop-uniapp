@@ -2,7 +2,7 @@
 import { onLoad } from '@dcloudio/uni-app'
 import {ref} from 'vue'
 import {useMemberStore} from '@/stores'
-import {getMemberProfileAPI, setMemberProfileAPI, type GetMemberProfileResult} from '@/services/profile'
+import {Gender, getMemberProfileAPI, setMemberProfileAPI, type GetMemberProfileResult} from '@/services/profile'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 const memberStore = useMemberStore() //这里为了更新仓库数据
@@ -47,10 +47,34 @@ const changeAvatar = ()=>{
   })
 }
 
+//单选框改变时回调
+const onGenderChange:UniHelper.RadioGroupOnChange = (e)=>{
+  profile.value.gender = e.detail.value as Gender
+}
+
+//生日(日期选择框)改变回调
+const onDateChange:UniHelper.DatePickerOnChange = (e)=>{
+  profile.value.birthday = e.detail.value
+}
+
+let cityCode:[string,string,string] = ['','','']
+//城市改变
+const onFullLocationChange:UniHelper.RegionPickerOnChange = (e)=>{
+  //更新前端界面
+  profile.value.fullLocation = e.detail.value.join(' ') //["北京市", "北京市", "东城区"]拼成湖南省 长沙市 芙蓉区
+  //更新后端
+  cityCode = e.detail.code!
+}
+
 const onSubmit = async()=>{
-  const {nickname} = profile.value
+  const {nickname,gender,birthday} = profile.value
  const res = await setMemberProfileAPI({
     nickname,
+    gender,
+    birthday,
+    provinceCode:cityCode[0],
+    cityCode:cityCode[1],
+    countyCode:cityCode[2],
   })
   if(res.result){
     memberStore.profile!.nickname = res.result?.nickname
@@ -94,7 +118,7 @@ onLoad(()=>{
         </view>
         <view class="form-item">
           <text class="label">性别</text>
-          <radio-group>
+          <radio-group @change="onGenderChange">
             <label class="radio">
               <radio value="男" color="#27ba9b" :checked="profile?.gender==='男'" />
               男
@@ -113,6 +137,7 @@ onLoad(()=>{
             start="1900-01-01"
             :end="new Date()"
             :value="profile?.birthday"
+            @change="onDateChange"
           >
             <view v-if="profile?.birthday">{{ profile?.birthday }}</view>
             <view class="placeholder" v-else>请选择日期</view>
@@ -120,7 +145,7 @@ onLoad(()=>{
         </view>
         <view class="form-item">
           <text class="label">城市</text>
-          <picker class="picker" mode="region" :value="['广东省', '广州市', '天河区']">
+          <picker class="picker" mode="region" :value="profile.fullLocation.split(' ')" @change="onFullLocationChange">
             <view v-if="profile?.fullLocation">{{ profile.fullLocation }}</view>
             <view class="placeholder" v-else>请选择城市</view>
           </picker>
