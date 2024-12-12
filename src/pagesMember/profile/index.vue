@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
 import {ref} from 'vue'
-import {getMemberProfileAPI, type GetMemberProfileResult} from '@/services/profile'
+import {useMemberStore} from '@/stores'
+import {getMemberProfileAPI, setMemberProfileAPI, type GetMemberProfileResult} from '@/services/profile'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
+const memberStore = useMemberStore() //这里为了更新仓库数据
 
 //个人信息
-const profile = ref<GetMemberProfileResult>()
+const profile = ref<GetMemberProfileResult>({} as GetMemberProfileResult)
 const getProfileData = async()=>{
   const res = await getMemberProfileAPI()
-  profile.value = res.result
+  if(res.result){
+    profile.value = res.result
+  }
 }
 
 const changeAvatar = ()=>{
@@ -31,6 +35,8 @@ const changeAvatar = ()=>{
             const {avatar} = JSON.parse(res.data).result
             // 当前页面更新头像
             profile.value!.avatar = avatar
+            //更新仓库头像(我的页面直接用的store数据渲染)
+            memberStore.profile!.avatar = avatar
             uni.showToast({icon:'success',title:'更新成功'})
           } else {
             uni.showToast({icon:'error',title:'出错啦'})
@@ -39,6 +45,21 @@ const changeAvatar = ()=>{
       })
     },
   })
+}
+
+const onSubmit = async()=>{
+  const {nickname} = profile.value
+ const res = await setMemberProfileAPI({
+    nickname,
+  })
+  if(res.result){
+    memberStore.profile!.nickname = res.result?.nickname
+    uni.showToast({icon:'success',title:'修改成功'})
+    setTimeout(() => {
+      uni.navigateBack()
+    }, 500);
+  }
+  
 }
 onLoad(()=>{
   getProfileData()
@@ -69,7 +90,7 @@ onLoad(()=>{
         </view>
         <view class="form-item">
           <text class="label">昵称</text>
-          <input class="input" type="text" placeholder="请填写昵称" :value="profile?.nickname" />
+          <input class="input" type="text" placeholder="请填写昵称" v-model="profile!.nickname" />
         </view>
         <view class="form-item">
           <text class="label">性别</text>
@@ -110,7 +131,7 @@ onLoad(()=>{
         </view>
       </view>
       <!-- 提交按钮 -->
-      <button class="form-button">保 存</button>
+      <button class="form-button" @tap="onSubmit">保 存</button>
     </view>
   </view>
 </template>
