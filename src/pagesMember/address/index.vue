@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onShow } from '@dcloudio/uni-app'
 import {ref} from 'vue'
-import {getMemberAddressListAPI, type MemberAddressListItem} from '@/services/address'
+import {deleteMemberAddressAPI, getMemberAddressListAPI, type MemberAddressListItem} from '@/services/address'
 
 const memberAddressList = ref<MemberAddressListItem[]>([])
 const getMemberAddressListData = async()=>{
@@ -9,6 +9,19 @@ const getMemberAddressListData = async()=>{
   if(res.result) {
     memberAddressList.value = res.result
   }
+}
+
+const onDelete = (id:string)=>{
+  uni.showModal({
+    content:'删除地址?',
+    success:async(res)=>{
+      if(res.confirm) {
+       await deleteMemberAddressAPI(id)
+       uni.showToast({icon:'success',title:'删除成功'})
+       getMemberAddressListData()
+      }
+    },
+  })
 }
 
 //页面显示调用
@@ -22,9 +35,11 @@ onShow(()=>{
     <!-- 地址列表 -->
     <scroll-view class="scroll-view" scroll-y>
       <view v-if="memberAddressList.length" class="address">
-        <view class="address-list">
-          <!-- 收货地址项 -->
-          <view class="item" v-for="item in memberAddressList" :key="item.id">
+        <!-- 滑动操作分区 -->
+        <uni-swipe-action class="address-list">
+          <!-- 收货地址项(滑动操作项) -->
+          <uni-swipe-action-item class="item" v-for="item in memberAddressList" :key="item.id">
+            <!-- 默认插槽 -->
             <view class="item-content">
               <view class="user">
                 {{ item.receiver }}
@@ -40,8 +55,12 @@ onShow(()=>{
                 修改
               </navigator>
             </view>
-          </view>
-        </view>
+            <!-- 右侧插槽 -->
+            <template #right>
+              <button class="delete-button" @tap="onDelete(item.id)">删除</button>
+            </template>
+          </uni-swipe-action-item>
+        </uni-swipe-action>
       </view>
       <view v-else class="blank">暂无收货地址</view>
     </scroll-view>

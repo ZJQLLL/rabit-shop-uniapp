@@ -101,3 +101,10 @@ export const getMemberAddressDetailAPI = (id:string)=>{
         url:`/member/address/${id}`,
     })
 }
+
+export const deleteMemberAddressAPI = (id:string)=>{
+    return http<AddMemberAddressResult>({
+        method:'DELETE',
+        url:`/member/address/${id}`
+    })
+}
