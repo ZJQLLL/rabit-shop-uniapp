@@ -26,7 +26,7 @@ const getGoodsDetail = async()=>{
       goods_id:res.result?.id??'',
       goods_name:res.result?.name??'',
       image:item.picture??'',
-      price:Number(item.price)??0,
+      price:Number(item.price)*100,
       sku_name_arr:item.specs.map(v=>v.valueName)??[],
       stock:item.inventory??0
     }
@@ -65,10 +65,20 @@ const openPopup = (name:typeof popupName.value)=>{
   popup.value?.open()
 }
 
+enum SkuMode {
+  BOTH = 1,
+  CART = 2,
+  BUY = 3,
+}
+//显示SKU弹窗
 const isShowSku = ref(false)
+// 商品信息
 const localdata = ref({} as SkuPopupLocaldata)
-const openSkuPopup = ()=>{
+// 按钮模式
+const mode = ref<SkuMode>(SkuMode.BOTH)
+const openSkuPopup = (val:SkuMode)=>{
   isShowSku.value = true
+  mode.value = val
 }
 
 
@@ -115,7 +125,7 @@ const query = defineProps<{
 
       <!-- 操作面板 -->
       <view class="action">
-        <view class="item arrow" @tap="openSkuPopup">
+        <view class="item arrow" @tap="openSkuPopup(SkuMode.BOTH)">
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>
@@ -193,8 +203,8 @@ const query = defineProps<{
       </navigator>
     </view>
     <view class="buttons">
-      <view class="addcart"> 加入购物车 </view>
-      <view class="buynow"> 立即购买 </view>
+      <view class="addcart" @tap="openSkuPopup(SkuMode.CART)"> 加入购物车 </view>
+      <view class="buynow" @tap="openSkuPopup(SkuMode.BUY)"> 立即购买 </view>
     </view>
   </view>
 
@@ -212,6 +222,9 @@ const query = defineProps<{
   <vk-data-goods-sku-popup
     v-model="isShowSku"
     :localdata="localdata"
+    :mode ="mode"
+    add-cart-background-color="#FFA868"
+    buy-now-background-color="#27BA9B"
   />
 </template>
 
