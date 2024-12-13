@@ -4,13 +4,41 @@ import {ref} from 'vue'
 import {getGoodsDetailAPI, type GetGoodsDetailResult} from '@/services/goods'
 import AddressPanel from './components/AddressPanel.vue'
 import ServicePanel from './components/ServicePanel.vue'
+import type { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
+
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 //商品信息
 const goodsDetail = ref<GetGoodsDetailResult>()
 const getGoodsDetail = async()=>{
  const res = await getGoodsDetailAPI({id:query.id})
- goodsDetail.value = res.result
+ if(res.result) {
+  goodsDetail.value = res.result
+
+ //sku组件所需格式
+ localdata.value = {
+  _id:res.result?.id,
+  goods_thumb:res.result.mainPictures[0],
+  name:res.result.name,
+  sku_list:res.result.skus.map(item=>{
+    return {
+      _id:item.id??'',
+      goods_id:res.result?.id??'',
+      goods_name:res.result?.name??'',
+      image:item.picture??'',
+      price:Number(item.price)??0,
+      sku_name_arr:item.specs.map(v=>v.valueName)??[],
+      stock:item.inventory??0
+    }
+  }),
+  spec_list:res.result.specs.map(v=>{
+    return {
+      name:v.name,
+      list:v.values
+    }
+  })
+ }
+}
 }
 
 //轮播图当前下标
@@ -35,6 +63,12 @@ const popupName = ref<'service' | 'address'>()
 const openPopup = (name:typeof popupName.value)=>{
   popupName.value = name
   popup.value?.open()
+}
+
+const isShowSku = ref(false)
+const localdata = ref({} as SkuPopupLocaldata)
+const openSkuPopup = ()=>{
+  isShowSku.value = true
 }
 
 
@@ -81,7 +115,7 @@ const query = defineProps<{
 
       <!-- 操作面板 -->
       <view class="action">
-        <view class="item arrow">
+        <view class="item arrow" @tap="openSkuPopup">
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>
@@ -172,7 +206,13 @@ const query = defineProps<{
     >
       <AddressPanel v-if="popupName==='address'" @close="popup.close()"/>
       <ServicePanel v-if="popupName==='service'" @close="popup.close()"/>
-    </uni-popup>
+  </uni-popup>
+
+  <!-- SKU组件 -->
+  <vk-data-goods-sku-popup
+    v-model="isShowSku"
+    :localdata="localdata"
+  />
 </template>
 
 <style lang="scss">
