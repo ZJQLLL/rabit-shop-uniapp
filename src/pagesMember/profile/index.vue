@@ -115,7 +115,7 @@ onLoad(()=>{
         <view class="form-item">
           <text class="label">昵称</text>
           <input class="input" type="text" placeholder="请填写昵称" v-model="profile!.nickname" />
-        </view>
+        </view> 
         <view class="form-item">
           <text class="label">性别</text>
           <radio-group @change="onGenderChange">
