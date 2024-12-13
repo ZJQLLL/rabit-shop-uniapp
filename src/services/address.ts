@@ -80,9 +80,24 @@ export const addMemberAddressAPI = (data:AddMemberAddressParams)=>{
     })
 }
 
+export const setMemberAddressAPI = (id:string,data:AddMemberAddressParams)=>{
+    return http<AddMemberAddressResult>({
+        method:'PUT',
+        url:`/member/address/${id}`,
+        data,
+    })
+}
+
 export const getMemberAddressListAPI = ()=>{
     return http<MemberAddressListItem[]>({
         method:'GET',
         url:'/member/address'
+    })
+}
+
+export const getMemberAddressDetailAPI = (id:string)=>{
+    return http<MemberAddressListItem>({
+        method:'GET',
+        url:`/member/address/${id}`,
     })
 }

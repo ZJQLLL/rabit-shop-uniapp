@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import {addMemberAddressAPI} from '@/services/address'
+import {addMemberAddressAPI, getMemberAddressDetailAPI, setMemberAddressAPI} from '@/services/address'
+import { onLoad } from '@dcloudio/uni-app'
 
 // 表单数据
 const form = ref({
@@ -28,13 +29,29 @@ const onSwitchChange:UniHelper.SwitchOnChange = (e)=>{
 }
 
 const onSubmit = async ()=>{
-  await addMemberAddressAPI(form.value)
-  uni.showToast({icon:'success',title:'添加成功'})
+  if(query.id) {
+    await setMemberAddressAPI(query.id,form.value)
+  } else {
+    await addMemberAddressAPI(form.value)
+  }
+  
+  uni.showToast({icon:'success',title:query.id?'修改成功':'添加成功'})
   setTimeout(() => {
     uni.navigateBack()
   }, 400);
 }
 
+/**
+ * 从其他页面跳转（重新进入页面）onLoad → onShow → onReady
+ * 从其他页面返回（返回已有页面）onShow
+ */
+onLoad(async()=>{
+  if(query.id){
+    const res = await getMemberAddressDetailAPI(query.id)
+    //数据合并到表单中
+    Object.assign(form.value,res.result)
+  }
+})
 
 const query = defineProps<{
   id?:string
