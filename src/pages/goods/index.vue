@@ -2,9 +2,10 @@
 import { onLoad } from '@dcloudio/uni-app'
 import {ref,computed} from 'vue'
 import {getGoodsDetailAPI, type GetGoodsDetailResult} from '@/services/goods'
+import {addMemberCartAPI} from '@/services/cart'
 import AddressPanel from './components/AddressPanel.vue'
 import ServicePanel from './components/ServicePanel.vue'
-import type { SkuPopupInstanceType, SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
+import type { SkuPopupEvent, SkuPopupInstanceType, SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -88,6 +89,14 @@ const selectArrText = computed(()=>{
   return skuPopupRef.value?.selectArr?.join(' ').trim() || '请选择商品规格'
 })
 
+const onAddCart = async(selectShop:SkuPopupEvent)=>{
+  await addMemberCartAPI({
+    skuId:selectShop._id,
+    count:selectShop.buy_num
+  })
+  uni.showToast({icon:'success',title:'添加成功'})
+  isShowSku.value = false
+}
 
 onLoad(()=>{
   getGoodsDetail()
@@ -238,6 +247,7 @@ const query = defineProps<{
       borderColor:'#27BA9B',
       backgroundColor: '#E9F8F5',
     }"
+    @cart="onAddCart"
   />
 </template>
 
