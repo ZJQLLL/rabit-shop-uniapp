@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onShow } from '@dcloudio/uni-app'
-import {ref} from 'vue'
-import {deleteCartAPI, getMemberCartListAPI, setMemberCartAPI, type CartListItem} from '@/services/cart'
+import {ref,computed} from 'vue'
+import {deleteCartAPI, getMemberCartListAPI, selectMemberCartAPI, setMemberCartAPI, type CartListItem} from '@/services/cart'
 import {useMemberStore} from '@/stores'
 import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/vk-data-input-number-box'
 
@@ -31,8 +31,31 @@ const onDelete = (skuId:string)=>{
   })
 }
 
+//修改单品数量
 const onChangeCount = async(e:InputNumberBoxEvent)=>{
  await setMemberCartAPI(e.index,{count:e.value})
+}
+
+//修改单品选中状态
+const onChangeCheck = async(item:CartListItem)=>{
+  //前端UI
+  item.selected = !item.selected
+  //通知后端
+  await setMemberCartAPI(item.skuId,{selected:item.selected})
+}
+
+//计算是否全选
+const selectedAll = computed(()=>{
+  return cartList.value.length && cartList.value.every(v=>v.selected)
+})
+
+const onChangeSelectedAll = async()=>{
+  //将全选状态的布尔值取反(选->不选,不选->选)
+  const _selectedAll = !selectedAll.value
+  //更新前端UI
+  cartList.value.forEach(item=>item.selected=_selectedAll)
+  //后端更新
+  await selectMemberCartAPI(_selectedAll)
 }
 
 onShow(()=>{
@@ -60,7 +83,7 @@ onShow(()=>{
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
-              <text class="checkbox" :class="{ checked: item.selected }"></text>
+              <text class="checkbox" :class="{ checked: item.selected }" @tap="onChangeCheck(item)"></text>
               <navigator
                 :url="`/pages/goods/index?id=${item.id}`"
                 hover-class="none"
@@ -107,7 +130,7 @@ onShow(()=>{
       </view>
       <!-- 吸底工具栏 -->
       <view class="toolbar">
-        <text class="all" :class="{ checked: true }">全选</text>
+        <text class="all" :class="{ checked: selectedAll }" @tap="onChangeSelectedAll">全选</text>
         <text class="text">合计:</text>
         <text class="amount">100</text>
         <view class="button-grounp">
