@@ -145,6 +145,32 @@ export interface GetMemberOrderNowParams{
       */
      skuId: string;
 }
+export interface SubmitOrderParams{
+    /**
+     * 所选地址Id
+     */
+    addressId: string;
+    /**
+     * 买家留言
+     */
+    buyerMessage: string;
+    /**
+     * 配送时间类型，1为不限，2为工作日，3为双休或假日
+     */
+    deliveryTimeType: number;
+    /**
+     * 商品集合
+     */
+    goods:Partial<Good>[];
+    /**
+     * 支付渠道：支付渠道，1支付宝、2微信--支付方式为在线支付时，传值，为货到付款时，不传值
+     */
+    payChannel: number;
+    /**
+     * 支付方式，1为在线支付，2为货到付款
+     */
+    payType: number;
+}
 
 /**
  * 填写订单-获取预付订单
@@ -162,6 +188,16 @@ export const getMemberOrderNowAPI = (data:GetMemberOrderNowParams)=>{
     return http<GetMemberOrderPreResult>({
         method:'GET',
         url:'/member/order/pre/now',
+        data,
+    })
+}
+/**
+ * 提交订单
+ */
+export const submitOrderAPI = (data:SubmitOrderParams)=>{
+    return http<{id:string}>({
+        method:'POST',
+        url:'/member/order',
         data,
     })
 }

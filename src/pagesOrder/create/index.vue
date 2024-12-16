@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import {getMemberOrderNowAPI, getMemberOrderPreAPI, type GetMemberOrderPreResult} from '@/services/order'
+import {getMemberOrderNowAPI, getMemberOrderPreAPI, submitOrderAPI, type GetMemberOrderPreResult} from '@/services/order'
 import {useAddressStore} from '@/stores/modules/address'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -48,6 +48,27 @@ const query = defineProps<{
   skuId:string,
   count:string
 }>()
+
+const onSubmit = async()=>{
+  if(!selectedAddressInfo.value?.id) {
+    return uni.showToast({icon:'none',title:'请选择收货地址'})
+  }
+ const res = await submitOrderAPI({
+  addressId:selectedAddressInfo.value?.id,
+  buyerMessage:buyerMessage.value,
+  deliveryTimeType:activeDelivery.value.type,
+  payChannel:2,
+  payType:1,
+  goods:orderPreData.value!.goods.map(v=>{
+    return {
+      count:v.count,
+      skuId:v.skuId,
+    }
+  })
+ })
+ //关闭当前页面,传递订单id
+ uni.redirectTo({url:`/pagesOrder/detail/index?id=${res.result?.id}`})
+}
 
 onLoad(()=>{
   getMemberOrderPreData()
@@ -139,7 +160,7 @@ onLoad(()=>{
     <view class="total-pay symbol">
       <text class="number">{{ orderPreData?.summary.totalPayPrice.toFixed(2) }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }"> 提交订单 </view>
+    <view class="button" :class="{ disabled: !selectedAddressInfo?.id }" @tap="onSubmit"> 提交订单 </view>
   </view>
 </template>
 
