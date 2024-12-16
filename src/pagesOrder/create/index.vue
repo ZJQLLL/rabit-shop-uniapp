@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import {getMemberOrderPreAPI, type GetMemberOrderPreResult} from '@/services/order'
+import {useAddressStore} from '@/stores/modules/address'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 // 订单备注
@@ -28,6 +29,12 @@ const getMemberOrderPreData = async()=>{
  orderPreData.value = res.result
 }
 
+const addressStore = useAddressStore()
+
+const selectedAddressInfo = computed(()=>{
+  return addressStore.selectedAddress || orderPreData.value?.userAddresses.find(v=>v.isDefault)
+})
+
 onLoad(()=>{
   getMemberOrderPreData()
 })
@@ -37,13 +44,13 @@ onLoad(()=>{
   <scroll-view scroll-y class="viewport">
     <!-- 收货地址 -->
     <navigator
-      v-if="false"
+      v-if="selectedAddressInfo"
       class="shipment"
       hover-class="none"
       url="/pagesMember/address/index?from=order"
     >
-      <view class="user"> 张三 13333333333 </view>
-      <view class="address"> 广东省 广州市 天河区 黑马程序员3 </view>
+      <view class="user">{{ selectedAddressInfo.receiver }} {{ selectedAddressInfo.contact }} </view>
+      <view class="address"> {{ selectedAddressInfo.fullLocation }} {{ selectedAddressInfo.address }} </view>
       <text class="icon icon-right"></text>
     </navigator>
     <navigator
