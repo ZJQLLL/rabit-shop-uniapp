@@ -82,6 +82,7 @@ const gotoPayment = ()=>{
     })
   }
   //跳转到结算页面
+  uni.navigateTo({url:'/pagesOrder/create/index'})
 }
 
 onShow(()=>{
