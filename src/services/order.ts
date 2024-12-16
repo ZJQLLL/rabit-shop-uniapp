@@ -131,6 +131,20 @@ export interface UserAddress {
      */
     receiver: string;
 }
+export interface GetMemberOrderNowParams{
+     /**
+     * 下单时已经选择好的地址id
+     */
+     addressId?: string;
+     /**
+      * 购买商品的数量
+      */
+     count: string;
+     /**
+      * 商品skuId
+      */
+     skuId: string;
+}
 
 /**
  * 填写订单-获取预付订单
@@ -139,5 +153,15 @@ export const getMemberOrderPreAPI = ()=>{
     return http<GetMemberOrderPreResult>({
         method:'GET',
         url:'/member/order/pre',
+    })
+}
+/**
+ * 填写订单-获取立即购买订单
+ */
+export const getMemberOrderNowAPI = (data:GetMemberOrderNowParams)=>{
+    return http<GetMemberOrderPreResult>({
+        method:'GET',
+        url:'/member/order/pre/now',
+        data,
     })
 }

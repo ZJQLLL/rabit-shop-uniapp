@@ -98,6 +98,10 @@ const onAddCart = async(selectShop:SkuPopupEvent)=>{
   isShowSku.value = false
 }
 
+const onBuyNow = (e:SkuPopupEvent)=>{
+  uni.navigateTo({url:`/pagesOrder/create/index?skuId=${e._id}&count=${e.buy_num}`})
+}
+
 onLoad(()=>{
   getGoodsDetail()
 })
@@ -248,6 +252,7 @@ const query = defineProps<{
       backgroundColor: '#E9F8F5',
     }"
     @cart="onAddCart"
+    @buy="onBuyNow"
   />
 </template>
 

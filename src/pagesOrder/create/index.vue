@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import {getMemberOrderPreAPI, type GetMemberOrderPreResult} from '@/services/order'
+import {getMemberOrderNowAPI, getMemberOrderPreAPI, type GetMemberOrderPreResult} from '@/services/order'
 import {useAddressStore} from '@/stores/modules/address'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -25,8 +25,17 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 //订单预支付信息
 const orderPreData = ref<GetMemberOrderPreResult>()
 const getMemberOrderPreData = async()=>{
- const res = await getMemberOrderPreAPI()
- orderPreData.value = res.result
+ if(query.count&&query.skuId){
+  //有立即购买参数
+  const res = await getMemberOrderNowAPI({
+    count:query.count,
+    skuId:query.skuId
+  })
+  orderPreData.value = res.result
+ } else {
+  const res = await getMemberOrderPreAPI()
+  orderPreData.value = res.result
+ }
 }
 
 const addressStore = useAddressStore()
@@ -34,6 +43,11 @@ const addressStore = useAddressStore()
 const selectedAddressInfo = computed(()=>{
   return addressStore.selectedAddress || orderPreData.value?.userAddresses.find(v=>v.isDefault)
 })
+
+const query = defineProps<{
+  skuId:string,
+  count:string
+}>()
 
 onLoad(()=>{
   getMemberOrderPreData()
