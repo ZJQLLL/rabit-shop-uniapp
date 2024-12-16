@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { onShow } from '@dcloudio/uni-app'
 import {ref} from 'vue'
-import {deleteCartAPI, getMemberCartListAPI, type CartListItem} from '@/services/cart'
+import {deleteCartAPI, getMemberCartListAPI, setMemberCartAPI, type CartListItem} from '@/services/cart'
 import {useMemberStore} from '@/stores'
+import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/vk-data-input-number-box'
 
 const memberStore = useMemberStore()
 const cartList = ref<CartListItem[]>([])
+
 const getCartListData = async()=>{
    const res = await getMemberCartListAPI()
    if(res.result){
@@ -13,6 +15,7 @@ const getCartListData = async()=>{
    }
    
 }
+
 const onDelete = (skuId:string)=>{
   uni.showModal({
     content: '是否删除',
@@ -26,8 +29,12 @@ const onDelete = (skuId:string)=>{
       } 
     }
   })
- 
 }
+
+const onChangeCount = async(e:InputNumberBoxEvent)=>{
+ await setMemberCartAPI(e.index,{count:e.value})
+}
+
 onShow(()=>{
   if(memberStore.profile) {
     getCartListData()
@@ -72,9 +79,13 @@ onShow(()=>{
               </navigator>
               <!-- 商品数量 -->
               <view class="count">
-                <text class="text">-</text>
-                <input class="input" type="number" :value="item.count.toString()" />
-                <text class="text">+</text>
+                <vk-data-input-number-box
+                v-model="item.count"
+                :min = "1"
+                :max="item.stock"
+                :index="item.skuId"
+                @change="onChangeCount"
+                />
               </view>
             </view>
             <!-- 右侧删除按钮 -->
