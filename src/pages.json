@@ -147,6 +147,12 @@
 						"navigationBarTitleText": "订单详情",
 						"navigationStyle": "custom"
 					}
+				},
+				{
+					"path": "payment/index",
+					"style": {
+						"navigationBarTitleText": "支付成功"
+					}
 				}
 			]
 		}

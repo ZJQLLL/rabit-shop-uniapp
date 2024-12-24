@@ -3,6 +3,7 @@ import { useGuessLikeList } from '@/composables'
 import { onReady,onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import {getMemberOrderDetailAPI, type GetMemberOrderDetailResult,OrderState,orderStateList} from '@/services/order'
+import {getWxPayAPI,getWxPayMockAPI } from '@/services/pay'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -86,9 +87,29 @@ const getOrderDetail = async()=>{
  const res = await getMemberOrderDetailAPI(query.id)
  orderInfo.value = res.result
 }
+
 onLoad(()=>{
   getOrderDetail()
 })
+
+const onTimeup = ()=>{
+  //倒计时结束修改订单状态为已取消
+  orderInfo.value!.orderState = OrderState.YiQuXiao
+}
+
+const onPay = async()=>{
+  if(import.meta.env.DEV){
+    //开发环境调内测接口
+    await getWxPayMockAPI(query.id)
+  }else {
+    const res = await getWxPayAPI(query.id)
+    if(res.result)
+    wx.requestPayment(res.result as any)
+  }
+
+  uni.redirectTo({url:`/pagesOrder/payment/index?id=${query.id}`})
+  
+}
 
 </script>
 
@@ -112,9 +133,17 @@ onLoad(()=>{
           <view class="tips">
             <text class="money">应付金额: ¥ 99.00</text>
             <text class="time">支付剩余</text>
-            00 时 29 分 59 秒
+            <uni-countdown 
+            color="#FFFFFF" 
+            splitorColor="#fff"
+            :showDay="false"
+            :show-colon="false"
+            :second="orderInfo.countdown"
+            @timeup="onTimeup"
+            />
+          
           </view>
-          <view class="button">去支付</view>
+          <view class="button" @tap="onPay">去支付</view>
         </template>
         <!-- 其他订单状态:展示再次购买按钮 -->
         <template v-else>
