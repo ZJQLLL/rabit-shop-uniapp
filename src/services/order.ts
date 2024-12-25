@@ -344,6 +344,57 @@ export interface Property {
      */
     propertyValueName: string;
 }
+export interface GetMemberOrderLogisticsResult {
+    /**
+     * 快递公司
+     */
+    company: Company;
+    /**
+     * 商品件数
+     */
+    count: number;
+    /**
+     * 物流日志
+     */
+    list: List[];
+    /**
+     * 商品图片
+     */
+    picture: string;
+}
+/**
+ * 快递公司
+ */
+export interface Company {
+    /**
+     * 公司名称
+     */
+    name: string;
+    /**
+     * 快递编号
+     */
+    number: string;
+    /**
+     * 联系电话
+     */
+    tel: string;
+}
+
+export interface List {
+    /**
+     * 信息ID
+     */
+    id: string;
+    /**
+     * 信息文字
+     */
+    text: string;
+    /**
+     * 时间
+     */
+    time: string;
+}
+
 
 
 /**
@@ -402,5 +453,14 @@ export const cancelMemberOrderAPI = (id:string,cancelReason:string)=>{
         method:'PUT',
         url:`/member/order/${id}/cancel`,
         data:cancelReason,
+    })
+}
+/**
+ * 获取订单物流
+ */
+export const getMemberOrderLogisticsAPI = (id:string)=>{
+    return http<GetMemberOrderLogisticsResult>({
+        method:'GET',
+        url:`/member/order/${id}/logistics`,
     })
 }
