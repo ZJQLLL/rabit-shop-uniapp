@@ -10,7 +10,7 @@ const httpInterceptor = {
             options.url = baseURL + options.url
         }
         //2、请求超时,默认60秒,太长,可以设置10秒
-        options.timeout = 10*1000
+        options.timeout = 50*1000
         //3、添加小程序端请求头标识
         options.header = {
             ...options.header,
