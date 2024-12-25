@@ -2,7 +2,7 @@
 import { useGuessLikeList } from '@/composables'
 import { onReady,onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
-import {getMemberOrderDetailAPI, type GetMemberOrderDetailResult,getMemberOrderLogisticsAPI,type GetMemberOrderLogisticsResult,type List,OrderState,orderStateList} from '@/services/order'
+import {cancelMemberOrderAPI, deleteMemberOrderAPI, getMemberOrderDetailAPI, type GetMemberOrderDetailResult,getMemberOrderLogisticsAPI,type GetMemberOrderLogisticsResult,type List,OrderState,orderStateList} from '@/services/order'
 import {getWxPayAPI,getWxPayMockAPI } from '@/services/pay'
 
 // 获取屏幕边界到安全区域距离
@@ -121,6 +121,26 @@ const getMemberOrderLogistics = async()=>{
   logisticList.value = res.result?.list
 }
 
+const deleteOrder = async()=> {
+  //删除订单
+  uni.showModal({
+    title: '删除订单',
+    content: '确定删除订单吗？',
+    success: async(res)=> {
+      if(res.confirm){
+        await deleteMemberOrderAPI([query.id])
+        uni.redirectTo({url:'/pagesOrder/list/index'})
+      }
+    }
+  })
+}
+
+const cancelOrder = async()=> {
+  //取消订单
+  await cancelMemberOrderAPI(query.id,reason.value)
+  uni.navigateBack()
+}
+
 </script>
 
 <template>
@@ -168,7 +188,7 @@ const getMemberOrderLogistics = async()=>{
               再次购买
             </navigator>
             <!-- 待发货状态：模拟发货,开发期间使用,用于修改订单状态为已发货 -->
-            <view v-if="false" class="button"> 模拟发货 </view>
+            <view v-if="orderInfo.orderState===OrderState.DaiFaHuo" class="button"> 模拟发货 </view>
           </view>
         </template>
       </view>
@@ -273,7 +293,7 @@ const getMemberOrderLogistics = async()=>{
           <!-- 待评价状态: 展示去评价 -->
           <view class="button" v-if="orderInfo.orderState===OrderState.DaiPingJia"> 去评价 </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
-          <view class="button delete" v-if="orderInfo.orderState>=OrderState.DaiPingJia"> 删除订单 </view>
+          <view class="button delete" v-if="orderInfo.orderState>=OrderState.DaiPingJia" @tap="deleteOrder"> 删除订单 </view>
         </template>
       </view>
     </template>
@@ -295,7 +315,7 @@ const getMemberOrderLogistics = async()=>{
       </view>
       <view class="footer">
         <view class="button" @tap="popup?.close?.()">取消</view>
-        <view class="button primary">确认</view>
+        <view class="button primary" @tap="cancelOrder">确认</view>
       </view>
     </view>
   </uni-popup>

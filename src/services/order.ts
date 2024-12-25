@@ -442,7 +442,7 @@ export const deleteMemberOrderAPI = (ids:string[])=>{
     return http({
         method:'DELETE',
         url:'/member/order',
-        data:ids,
+        data:{ids},
     })
 }
 /**
@@ -452,7 +452,7 @@ export const cancelMemberOrderAPI = (id:string,cancelReason:string)=>{
     return http<GetMemberOrderDetailResult>({
         method:'PUT',
         url:`/member/order/${id}/cancel`,
-        data:cancelReason,
+        data:{cancelReason},
     })
 }
 /**
