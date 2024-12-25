@@ -2,7 +2,7 @@
 import { useGuessLikeList } from '@/composables'
 import { onReady,onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
-import {cancelMemberOrderAPI, deleteMemberOrderAPI, getMemberOrderDetailAPI, type GetMemberOrderDetailResult,getMemberOrderLogisticsAPI,type GetMemberOrderLogisticsResult,type List,OrderState,orderStateList} from '@/services/order'
+import {cancelMemberOrderAPI, confirmMemberOrderAPI, deleteMemberOrderAPI, getMemberOrderDetailAPI, type GetMemberOrderDetailResult,getMemberOrderLogisticsAPI,type GetMemberOrderLogisticsResult,type List,mockMemberOrderConsignAPI,OrderState,orderStateList} from '@/services/order'
 import {getWxPayAPI,getWxPayMockAPI } from '@/services/pay'
 
 // 获取屏幕边界到安全区域距离
@@ -141,6 +141,31 @@ const cancelOrder = async()=> {
   uni.navigateBack()
 }
 
+const isDev = import.meta.env.DEV
+const mockConsignment = async()=> {
+  if(isDev) {
+    await mockMemberOrderConsignAPI(query.id)
+    uni.showToast({title:'模拟发货成功'})
+    //模拟发货
+    orderInfo.value!.orderState = OrderState.DaiShouHuo
+  }
+}
+
+const conformReceipt = async()=> {
+  //确认收货
+  uni.showModal({
+    title: '确认收货',
+    content: '确定收到货物了吗？',
+    success: async(res)=> {
+      if(res.confirm){
+       const res = await confirmMemberOrderAPI(query.id)
+       //更新订单信息
+        orderInfo.value = res.result
+      }
+    }
+  })
+}
+
 </script>
 
 <template>
@@ -188,7 +213,7 @@ const cancelOrder = async()=> {
               再次购买
             </navigator>
             <!-- 待发货状态：模拟发货,开发期间使用,用于修改订单状态为已发货 -->
-            <view v-if="orderInfo.orderState===OrderState.DaiFaHuo" class="button"> 模拟发货 </view>
+            <view v-if="orderInfo.orderState===OrderState.DaiFaHuo && isDev" class="button" @tap="mockConsignment"> 模拟发货 </view>
           </view>
         </template>
       </view>
@@ -289,7 +314,7 @@ const cancelOrder = async()=> {
             再次购买
           </navigator>
           <!-- 待收货状态: 展示确认收货 -->
-          <view class="button primary" v-if="orderInfo.orderState===OrderState.DaiShouHuo"> 确认收货 </view>
+          <view class="button primary" v-if="orderInfo.orderState===OrderState.DaiShouHuo" @tap="conformReceipt"> 确认收货 </view>
           <!-- 待评价状态: 展示去评价 -->
           <view class="button" v-if="orderInfo.orderState===OrderState.DaiPingJia"> 去评价 </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->

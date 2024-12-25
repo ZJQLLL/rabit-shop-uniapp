@@ -464,3 +464,21 @@ export const getMemberOrderLogisticsAPI = (id:string)=>{
         url:`/member/order/${id}/logistics`,
     })
 }
+/**
+ * 确认收货
+ */
+export const confirmMemberOrderAPI = (id:string)=> {
+    return http<GetMemberOrderDetailResult>({
+        method:'PUT',
+        url:`/member/order/${id}/receipt`,
+    })
+}
+/**
+ * 模拟发货
+ */
+export const mockMemberOrderConsignAPI = (id:string)=>{
+    return http({
+        method:'GET',
+        url:`/member/order/consignment/${id}`,
+    })
+}
